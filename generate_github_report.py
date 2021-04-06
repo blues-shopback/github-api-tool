@@ -129,7 +129,7 @@ def generate_github_report(args):
         repo_info_list.append(repo_info)
 
         if args.orphan_report:
-            if repo_info["team"] is None:
+            if repo_info["team"] is None and repo["archived"] is False:
                 repo_name = repo_info["name"]
                 name_date_list = get_commits(repo_name)
                 orphan_data[repo_name] = name_date_list
