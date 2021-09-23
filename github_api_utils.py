@@ -1,6 +1,10 @@
 import requests
 
 
+def _get_token_header(token):
+    return {"Authorization": "token {}".format(token)}
+
+
 def _find_next_link(headers):
     if "link" not in headers:
         return None
@@ -10,13 +14,14 @@ def _find_next_link(headers):
 
 
 def _get_list_data_scroll(token, url, data_proc_fn=None, page_size=100):
+    headers = _get_token_header(token)
     params = {
-        "access_token": token,
         "per_page": page_size,
         "page": 1}
     res = requests.get(
         url,
-        params=params)
+        params=params,
+        headers=headers)
     # If status code is not 200, return.
     if res.status_code != 200:
         return None
@@ -29,7 +34,9 @@ def _get_list_data_scroll(token, url, data_proc_fn=None, page_size=100):
 
     next_link = _find_next_link(res.headers)
     while next_link:
-        res = requests.get(next_link)
+        res = requests.get(
+            next_link,
+            headers=headers)
         res.raise_for_status()
         if data_proc_fn is not None:
             data_list = data_proc_fn(res.json())
@@ -114,12 +121,11 @@ def repo_has_alert_setting(org, token, repo):
     Return:
         bool, indicate repo has alerts setting or not.
     """
-    params = {"access_token": token}
-    headers = {"Accept": "application/vnd.github.dorian-preview+json"}
+    headers = _get_token_header(token)
+    headers.update({"Accept": "application/vnd.github.dorian-preview+json"})
     res = requests.get(
         "https://api.github.com/repos/{}/{}/vulnerability-alerts".format(
             org, repo),
-        params=params,
         headers=headers)
     if res.status_code == 204:
         return True
@@ -128,11 +134,11 @@ def repo_has_alert_setting(org, token, repo):
 
 
 def _get_org_info(org, token):
-    params = {"access_token": token}
+    headers = _get_token_header(token)
     url = "https://api.github.com/orgs/{}".format(org)
     res = requests.get(
         url,
-        params=params)
+        headers=headers)
     if res.status_code == 200:
         return res.json()
 
@@ -183,11 +189,11 @@ def get_repo_files(org, token, repo, director):
     Return:
         list of dict. Each dict is a file's information.
     """
-    params = {"access_token": token}
+    headers = _get_token_header(token)
     res = requests.get(
         "https://api.github.com/repos/{}/{}/contents/{}".format(
             org, repo, director),
-        params=params)
+        headers=headers)
     if res.status_code == 200:
         data = []
         for d in res.json():
@@ -228,9 +234,9 @@ def get_github_config(org, token, repo, director):
 
 
 def get_has_readme(org, token, repo):
-    params = {"access_token": token}
+    headers = _get_token_header(token)
     res = requests.get("https://api.github.com/repos/{}/{}/readme".format(org, repo),
-                       params=params)
+                       headers=headers)
     if res.status_code != 200:
         return False
     else:
