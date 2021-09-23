@@ -6,6 +6,7 @@ from datetime import datetime
 import concurrent.futures
 
 import github_api_utils as github_utils
+from github_graphql_utils import get_repo_list_alert
 
 
 OWNER = os.getenv("OWNER", "shopback")
@@ -78,19 +79,25 @@ def get_keys(repo_name):
     return key_list
 
 
+def get_alert_counts(repo_name):
+    return get_repo_list_alert(OWNER, TOKEN, repo_name)
+
+
 def get_repo_info(repo):
     repo_name = repo["name"]
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
         future1 = executor.submit(get_team_name, repo_name)
         future2 = executor.submit(get_workflow_name_list, repo_name)
         future3 = executor.submit(get_webhooks, repo_name)
         future4 = executor.submit(get_keys, repo_name)
+        future5 = executor.submit(get_alert_counts, repo_name)
 
         team_name = future1.result()
         workflow_list = future2.result()
         webhook_list = future3.result()
         key_list = future4.result()
+        alert_counts = future5.result()
 
     workflow_count = len(workflow_list)
     webhook_count = len(webhook_list)
@@ -100,11 +107,15 @@ def get_repo_info(repo):
     repo_info = {
         "name": repo_name,
         "team": team_name,
-        "key_count": key_count,
+        "keyCount": key_count,
         "workflowCount": workflow_count,
         "webhookCount": webhook_count,
         "workflowNames": ",".join(workflow_list),
-        "webhookNames": ",".join(webhook_list)
+        "webhookNames": ",".join(webhook_list),
+        "alertCount_CRITICAL": alert_counts["CRITICAL"],
+        "alertCount_HIGH": alert_counts["HIGH"],
+        "alertCount_MODERATE": alert_counts["MODERATE"],
+        "alertCount_LOW": alert_counts["LOW"]
      }
 
     return repo_info
