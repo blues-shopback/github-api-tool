@@ -11,10 +11,17 @@ Using github token to crawl repo information.
 4. Click `Generate token` in the bottom of page.
 5. Write down the token, it only shows once.
 
+### Install Dependency
+    pip3 install requests
+
 ### Generate Report
 Add your github token to env:
 
     export GITHUB_TOKEN=your-github-token
+
+Create output directory:
+
+    mkdir path/to/output/dir
 
 Go to repo directory
 
@@ -22,8 +29,8 @@ Go to repo directory
 
 Start generate reports:
 
-    python3 generate_github_report.py --output output-dir-path
+    python3 generate_github_report.py --output path/to/output/dir
 
 Note:
-- output directory needs created in advance.
-- Test run few repo with flag. ex: add flag `--test_limit 3` will run for 3 repo.
+- Output directory needs created in advance.
+- Test run few repo with flag `test_limit`. ex: add flag `--test_limit 3` will run only for 3 repo.
