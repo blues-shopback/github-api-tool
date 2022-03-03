@@ -14,6 +14,7 @@ alert_query_str = """
                 startCursor
             }
             nodes {
+                state
                 id
                 createdAt
                 dismissedAt
@@ -39,7 +40,9 @@ def _count_alert_severity(nodes):
     id_set = set()
     for node in nodes:
         severity = node["securityVulnerability"]["severity"]
-        counter[severity] += 1
+        state = node["state"]
+        key = "_".join([severity, state])
+        counter[key] += 1
         id_set.add(node["id"])
 
     return counter, id_set

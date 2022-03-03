@@ -112,10 +112,14 @@ def get_repo_info(repo):
         "webhookCount": webhook_count,
         "workflowNames": ",".join(workflow_list),
         "webhookNames": ",".join(webhook_list),
-        "alertCount_CRITICAL": alert_counts["CRITICAL"],
-        "alertCount_HIGH": alert_counts["HIGH"],
-        "alertCount_MODERATE": alert_counts["MODERATE"],
-        "alertCount_LOW": alert_counts["LOW"]
+        "alertCount_CRITICAL_FIXED": alert_counts["CRITICAL_FIXED"],
+        "alertCount_HIGH_FIXED": alert_counts["HIGH_FIXED"],
+        "alertCount_MODERATE_FIXED": alert_counts["MODERATE_FIXED"],
+        "alertCount_LOW_FIXED": alert_counts["LOW_FIXED"],
+        "alertCount_CRITICAL_OPEN": alert_counts["CRITICAL_OPEN"],
+        "alertCount_HIGH_OPEN": alert_counts["HIGH_OPEN"],
+        "alertCount_MODERATE_OPEN": alert_counts["MODERATE_OPEN"],
+        "alertCount_LOW_OPEN": alert_counts["LOW_OPEN"],
      }
 
     return repo_info
